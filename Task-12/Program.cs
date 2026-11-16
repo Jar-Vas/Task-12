@@ -11,7 +11,7 @@ namespace Task_12
             Console.WriteLine("Task-1");
             string filePathPrime = "prime.txt";
             string filePathFib = "fib.txt";
-            int size = 100;
+            int size = 1000; //1e2 
             int[] arr1 = new int[size];
             bool[] arr2 = new bool[size];
             bool[] arr3 = new bool[size];
@@ -37,14 +37,18 @@ namespace Task_12
             for (int i = 0; i < data2.Count() - wordToChange.Count(); i++)
             {
                 bool k = true;
-                for (int j = 0; j < wordToChange.Count(); j++)
+                if (wordToChange.Count() == 0) { k = false; }
+                else
                 {
-                    if (data2[i+j] != wordToChange[j]) { k = false; break; }
+                    for (int j = 0; j < wordToChange.Count(); j++)
+                    {
+                        if (data2[i + j] != wordToChange[j]) { k = false; break; }
+                    }
                 }
                 if (k)
                 {
                     outData2 += wordChangeTo;
-                    i += wordToChange.Count() - 1;
+                    i += Math.Max(wordToChange.Count() - 1, 0);
                     //Console.WriteLine("Word fined");
                 }
                 else
@@ -77,9 +81,12 @@ namespace Task_12
                 for (int i = 0; i < data3.Count() - t.Count(); i++)
                 {
                     bool k = true;
-                    for (int j = 0; j < t.Count(); j++)
+                    if (t.Count() == 0) { k = false; }
                     {
-                        if (data3[i + j] != t[j]) { k = false; break; }
+                        for (int j = 0; j < t.Count(); j++)
+                        {
+                            if (data3[i + j] != t[j]) { k = false; break; }
+                        }
                     }
                     if (k)
                     {
@@ -87,7 +94,7 @@ namespace Task_12
                         {
                             outData3 += "#";
                         }
-                        i += t.Count() - 1;
+                        i += Math.Max(t.Count() - 1, 0);
                         //Console.WriteLine("Word fined");
                     }
                     else
@@ -101,12 +108,43 @@ namespace Task_12
 
             Console.WriteLine("Task-4");
             Console.Write("Write file path: ");
-            string filePath4 = Console.ReadLine();
-            string data4 = File.ReadAllText(filePath4);
-            data4.Reverse();
+            string filePath4 = Console.ReadLine(); 
+            char[] charArray = File.ReadAllText(filePath4).ToCharArray();
+            Array.Reverse(charArray);
+            string data4 = new string(charArray);
             File.WriteAllText("reversed_" + filePath4, data4);
 
+
+            Console.WriteLine("Task-5");
+            Console.Write("Write file path: ");
+            string filePath5 = Console.ReadLine();
+            string[] data5 = File.ReadAllText(filePath5).Split(' ');
+            int[] data5Int = new int[data5.Length];
+            int it = 0;
+            foreach (string s in data5) { int.TryParse(s, out data5Int[it]); it++; }
+            int[] fileData = new int[4] { 0, 0, 0, 0 };
+            string[] fileNames = new string[4] { "pos.txt", "neg.txt", "2-dig.txt", "5-dig.txt" };
+            var operations = new Func<int, bool>[4] { (a) => a > 0, (a) => a < 0, (a) => Math.Abs(a) < 100, (a) => Math.Abs(a) < 100000 }; // MAGIC
+
+
+            for (int j = 0; j < fileData.Count(); j++)
+            {
+                File.WriteAllText(fileNames[j], ""); //clear and open
+            }
+            foreach (int num in data5Int)
+            {
+                for (int j = 0; j < fileData.Count(); j++)
+                {
+                    if (operations[j](num))
+                    {
+                        File.AppendAllText(fileNames[j], num.ToString() + " ");
+                        fileData[j]++;
+                    }
+                }
+            }
         }
+
+
         static bool isPrime(long number) // start
         {
             // O(sqrt(n)/2) in worth way. For long.max it be < 500M operation. For int.max in be < 50K operation
